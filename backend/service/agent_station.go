@@ -68,6 +68,7 @@ func (manager *AgentStationManager) SetAgentStation(login AgentLogin, station St
 		log.Print("Unable to find agent ", login, " in connected agents")
 	}
 	if agent.station != nil && *agent.station == station {
+		log.Print("Agent already in station")
 		return false
 	}
 	manager.RemoveAgentFromStation(login)

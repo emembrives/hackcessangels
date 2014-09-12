@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	keepAliveTimeout = time.Minute * 5
+	keepAliveTimeout = time.Minute * 1
 )
 
 type AgentLogin string
@@ -101,8 +101,8 @@ func (ca *ConnectedAgent) handleConnection() {
 			user.LastStationUpdate = time.Now()
 			user.Save()
 			if arrivedInStation {
-				go ca.UpdateStationName(station)
-				go ca.UpdateHelpRequests()
+				ca.UpdateStationName(station)
+				//ca.UpdateHelpRequests()
 			}
 		}
 	}
@@ -138,11 +138,12 @@ func (ca *ConnectedAgent) sendKeepAlive() {
 	err = ca.readWriter.Flush()
 	if err != nil {
 		log.Print("Failed to flush keep alive for agent", ca.login, ":", err)
+		ca.connection.Close()
 	}
 }
 
 func (ca *ConnectedAgent) UpdateStationName(station *model.Station) {
-	message := ServerMessage{}
+	message := ServerMessage{UpdateRequestsNow: true}
 	if station != nil {
 		message.StationName = &station.Name
 	} else {
@@ -152,6 +153,7 @@ func (ca *ConnectedAgent) UpdateStationName(station *model.Station) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Print("Updating station name to ", string(j))
 	_, err = ca.readWriter.Write(j)
 	if err != nil {
 		log.Print("Failed to update requests for agent", ca.login, ":", err)
@@ -163,6 +165,7 @@ func (ca *ConnectedAgent) UpdateStationName(station *model.Station) {
 	err = ca.readWriter.Flush()
 	if err != nil {
 		log.Print("Failed to flush update requests for agent", ca.login, ":", err)
+		ca.connection.Close()
 	}
 }
 
@@ -183,5 +186,6 @@ func (ca *ConnectedAgent) UpdateHelpRequests() {
 	err = ca.readWriter.Flush()
 	if err != nil {
 		log.Print("Failed to flush update requests for agent", ca.login, ":", err)
+		ca.connection.Close()
 	}
 }

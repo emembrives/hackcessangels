@@ -67,8 +67,8 @@ func (s *AgentService) Listen() {
 }
 
 type ServerMessage struct {
-	UpdateRequestsNow bool
-	KeepAlive         bool
+	UpdateRequestsNow bool `json:"UpdateRequestsNow,omitempty"`
+	KeepAlive         bool `json:"KeepAlive,omitempty"`
 	StationName       *string `json:"StationName,omitempty"`
 }
 
@@ -85,7 +85,7 @@ func (s *AgentService) handleRequest(conn net.Conn) {
 	log.Println("New connection")
 	readWriter := bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 
-	conn.SetDeadline(time.Now().Add(20 * time.Second))
+	conn.SetDeadline(time.Now().Add(30 * time.Second))
 	message, err := readFromClient(readWriter.Reader)
 	if err != nil {
 		log.Println("Error while reading initial data: ", err)
