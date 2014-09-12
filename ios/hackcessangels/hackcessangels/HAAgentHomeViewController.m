@@ -60,6 +60,7 @@
         self.stationLabel.text = @"En dehors d'une gare";
     }
     self.stationLabel.hidden = !service.connected;
+    NSLog(@"Gare: %@", self.stationLabel.text);
 }
 
 - (void)viewDidAppear:(BOOL)animated {

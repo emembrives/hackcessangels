@@ -206,10 +206,13 @@ const int kRetryIntervalInSeconds = 10;
                 NSDictionary *incomingData = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
                 DLog(@"Received: %@", incomingData);
                 
+                bool dataAvailable = false;
                 if ([[incomingData objectForKey:@"KeepAlive"] boolValue] == YES) {
+                    dataAvailable = true;
                     [self sendPosition];
                 }
                 if ([[incomingData objectForKey:@"UpdateRequestsNow"] boolValue] == YES) {
+                    dataAvailable = true;
                     [self.requestsService getRequests:^(NSArray *helpRequestList) {
                         DLog(@"%@", helpRequestList);
                     } failure:^(NSError *error) {
@@ -217,6 +220,7 @@ const int kRetryIntervalInSeconds = 10;
                     }];
                 }
                 if ([incomingData objectForKey:@"StationName"]) {
+                    dataAvailable = true;
                     NSString* serverStationName = [incomingData objectForKey:@"StationName"];
                     if ([serverStationName length] == 0) {
                         _stationName = nil;
@@ -226,6 +230,11 @@ const int kRetryIntervalInSeconds = 10;
                     [[NSNotificationCenter defaultCenter]
                      postNotificationName:@"ConnectionStatusNotification"
                      object:self];
+                }
+                if (!dataAvailable) {
+                    NSLog(@"No data available: %@", error);
+                    [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(connectToServerInternal) userInfo:nil repeats:NO];
+                    [self disconnectFromServer];
                 }
             }
             break;

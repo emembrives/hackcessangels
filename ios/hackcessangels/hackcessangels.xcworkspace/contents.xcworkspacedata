@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:hackcessangelsTests/etienne.gpx">
+   </FileRef>
+   <FileRef
       location = "group:hackcessangels.xcodeproj">
    </FileRef>
    <FileRef
