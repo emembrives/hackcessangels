@@ -1,0 +1,30 @@
+digraph states {
+    graph [dpi=300]; 
+    overlap=false;
+    NEW [label="Nouvelle demande"];
+    NO_AGENTS [label="Pas d'agents"];
+    RETRY [label="Rappel"];
+    CANCELLED [label="Annulée"];
+    ABORTED [label="Abandonnée"];
+    AGENT_ANSWERED [label="Agent intervient"];
+    COMPLETED [label="Fin de demande"];
+    REPORT_FILLED [label="Rapport"];
+    NOT_IN_STATION [label="Hors d'une gare"];
+    TIMEOUT [label="Délai dépassé"];
+
+    NEW -> NO_AGENTS;
+    NEW -> TIMEOUT [label=">1 min"];
+    NEW -> CANCELLED;
+    NEW -> AGENT_ANSWERED [label="Un agent prend\nl'appel"];
+    NEW -> NOT_IN_STATION;
+
+    TIMEOUT -> RETRY;
+    TIMEOUT -> ABORTED;
+    RETRY -> CANCELLED;
+    RETRY -> AGENT_ANSWERED;
+    RETRY -> ABORTED [label=">2 min"];
+
+    AGENT_ANSWERED -> COMPLETED [label=">15 min"];
+    COMPLETED -> REPORT_FILLED;
+    AGENT_ANSWERED -> CANCELLED;
+}
